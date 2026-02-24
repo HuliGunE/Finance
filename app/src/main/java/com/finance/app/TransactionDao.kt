@@ -8,6 +8,13 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE companyId = :companyId ORDER BY dateMillis DESC")
     fun getByCompany(companyId: Long): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM transactions WHERE companyId = :companyId AND dateMillis BETWEEN :startMillis AND :endMillis ORDER BY dateMillis")
+    suspend fun getByCompanyAndPeriod(
+        companyId: Long,
+        startMillis: Long,
+        endMillis: Long
+    ): List<Transaction>
+
     @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE companyId = :companyId AND type = 'income'")
     fun getTotalIncome(companyId: Long): Flow<Double>
 

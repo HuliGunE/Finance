@@ -2,11 +2,11 @@ package com.finance.app
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.finance.app.databinding.ActivityMainBinding
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+        setupDeveloperEasterEgg()
         db = AppDatabase.getInstance(this)
 
         adapter = CompanyAdapter { company ->
@@ -60,6 +61,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
         loadCompanies()
+    }
+
+    private fun setupDeveloperEasterEgg() {
+        var tapCount = 0
+        binding.toolbar.setOnClickListener {
+            tapCount++
+            if (tapCount >= 5) {
+                tapCount = 0
+                Toast.makeText(
+                    this,
+                    getString(R.string.developer_info_text),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     override fun onResume() {

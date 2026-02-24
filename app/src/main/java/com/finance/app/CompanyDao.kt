@@ -14,6 +14,9 @@ interface CompanyDao {
     @Query("SELECT * FROM companies WHERE id = :id")
     suspend fun getById(id: Long): Company?
 
+    @Update
+    suspend fun update(company: Company)
+
     @Delete
     suspend fun delete(company: Company)
 }
