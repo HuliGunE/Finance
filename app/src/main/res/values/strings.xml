@@ -42,4 +42,6 @@
     <string name="filter_expense">Витрати</string>
     <string name="filter_date">Фільтр за датою</string>
     <string name="filter_date_clear">Скинути фільтр дати</string>
+    <string name="filter_amount_from">Сума від</string>
+    <string name="filter_amount_to">Сума до</string>
 </resources>

@@ -316,6 +316,13 @@ class CompanyDetailActivity : AppCompatActivity() {
             applyFilters()
         }
 
+        binding.etAmountFrom.addTextChangedListener {
+            applyFilters()
+        }
+        binding.etAmountTo.addTextChangedListener {
+            applyFilters()
+        }
+
         binding.chipAll.setOnClickListener {
             typeFilter = null
             applyFilters()
@@ -351,6 +358,18 @@ class CompanyDetailActivity : AppCompatActivity() {
         if (searchQuery.isNotEmpty()) {
             val q = searchQuery.lowercase(Locale.getDefault())
             list = list.filter { it.description.lowercase(Locale.getDefault()).contains(q) }
+        }
+
+        val fromText = binding.etAmountFrom.text?.toString()?.replace(',', '.')
+        val toText = binding.etAmountTo.text?.toString()?.replace(',', '.')
+        val fromVal = fromText?.toDoubleOrNull()
+        val toVal = toText?.toDoubleOrNull()
+
+        fromVal?.let { min ->
+            list = list.filter { it.amount >= min }
+        }
+        toVal?.let { max ->
+            list = list.filter { it.amount <= max }
         }
 
         dateFilterStart?.let { start ->
