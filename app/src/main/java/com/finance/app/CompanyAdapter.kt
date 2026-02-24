@@ -33,7 +33,7 @@ class CompanyAdapter(
     inner class ViewHolder(private val binding: ItemCompanyBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                val item = getItem(bindingAdapterPosition)
+                val item = getItem(adapterPosition)
                 onItemClick(item.company)
             }
         }
