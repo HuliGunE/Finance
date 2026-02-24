@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.finance.app.databinding.ActivityCompanyDetailBinding
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -310,8 +311,8 @@ class CompanyDetailActivity : AppCompatActivity() {
     }
 
     private fun setupFiltersUi() {
-        binding.etSearch.addTextChangedListener {
-            searchQuery = it?.toString()?.trim().orEmpty()
+        binding.etSearch.addTextChangedListener { text, _, _, _ ->
+            searchQuery = text?.toString()?.trim().orEmpty()
             applyFilters()
         }
 
