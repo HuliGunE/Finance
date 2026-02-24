@@ -31,9 +31,15 @@
     <string name="delete_company_confirm">Видалити цю фірму та всі її операції?</string>
     <string name="export_pdf">Експорт у PDF</string>
     <string name="select_period">Виберіть період</string>
-    <string name="pdf_saved">PDF-звіт збережено:\n%1$s</string>
+    <string name="pdf_saved">PDF-звіт збережено у папці «Завантаження».</string>
     <string name="pdf_no_transactions">За вказаний період немає операцій.</string>
     <string name="developer_info_title">Про розробника</string>
     <string name="developer_info_text">Автор додатку: Халімоненко Юрій</string>
     <string name="pdf_error">Не вдалося створити PDF</string>
+    <string name="search_hint">Пошук по опису…</string>
+    <string name="filter_all">Усі</string>
+    <string name="filter_income">Доходи</string>
+    <string name="filter_expense">Витрати</string>
+    <string name="filter_date">Фільтр за датою</string>
+    <string name="filter_date_clear">Скинути фільтр дати</string>
 </resources>

@@ -1,10 +1,14 @@
 package com.finance.app
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.ContentValues
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
+import android.provider.MediaStore
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -16,8 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
@@ -35,6 +37,11 @@ class CompanyDetailActivity : AppCompatActivity() {
     private lateinit var companyName: String
     private lateinit var db: AppDatabase
     private lateinit var transactionAdapter: TransactionAdapter
+    private var allTransactions: List<Transaction> = emptyList()
+    private var typeFilter: String? = null // "income", "expense" або null
+    private var searchQuery: String = ""
+    private var dateFilterStart: Long? = null
+    private var dateFilterEnd: Long? = null
     private var currentBalance: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +80,8 @@ class CompanyDetailActivity : AppCompatActivity() {
             startAddTransaction("expense")
         }
 
+        setupFiltersUi()
+
         lifecycleScope.launch {
             combine(
                 db.transactionDao().getByCompany(companyId),
@@ -91,9 +100,8 @@ class CompanyDetailActivity : AppCompatActivity() {
                 )
                 binding.tvTotalIncome.text = "+ ${df.format(income)} грн"
                 binding.tvTotalExpense.text = "− ${df.format(expense)} грн"
-                transactionAdapter.submitList(transactions)
-                binding.emptyTransactions.visibility = if (transactions.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
-                binding.recyclerTransactions.visibility = if (transactions.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
+                allTransactions = transactions
+                applyFilters()
             }
         }
     }
@@ -168,6 +176,10 @@ class CompanyDetailActivity : AppCompatActivity() {
             val start = range.first
             val end = range.second
             if (start != null && end != null) {
+                dateFilterStart = start
+                dateFilterEnd = end
+                updateDateFilterLabel()
+                applyFilters()
                 generatePdf(start, end)
             }
         }
@@ -229,22 +241,58 @@ class CompanyDetailActivity : AppCompatActivity() {
 
                 pdf.finishPage(page)
 
-                val dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-                if (dir != null && !dir.exists()) {
-                    dir.mkdirs()
+                val resolver = contentResolver
+                val fileName = "report_${companyId}_${System.currentTimeMillis()}.pdf"
+                val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                } else {
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI
                 }
-                val file = File(dir, "report_${companyId}_${System.currentTimeMillis()}.pdf")
-                FileOutputStream(file).use { out ->
+
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                }
+
+                val uri: Uri? = resolver.insert(collection, values)
+                if (uri == null) {
+                    pdf.close()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@CompanyDetailActivity, getString(R.string.pdf_error), Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
+                }
+
+                resolver.openOutputStream(uri)?.use { out ->
                     pdf.writeTo(out)
+                } ?: run {
+                    pdf.close()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@CompanyDetailActivity, getString(R.string.pdf_error), Toast.LENGTH_SHORT).show()
+                    }
+                    return@launch
                 }
                 pdf.close()
 
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         this@CompanyDetailActivity,
-                        getString(R.string.pdf_saved, file.absolutePath),
+                        getString(R.string.pdf_saved),
                         Toast.LENGTH_LONG
                     ).show()
+                    val openIntent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(uri, "application/pdf")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    try {
+                        startActivity(openIntent)
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(
+                            this@CompanyDetailActivity,
+                            "Не знайдено програму для відкриття PDF",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -259,5 +307,71 @@ class CompanyDetailActivity : AppCompatActivity() {
         i.putExtra(AddTransactionActivity.EXTRA_COMPANY_ID, companyId)
         i.putExtra(AddTransactionActivity.EXTRA_TYPE, type)
         startActivity(i)
+    }
+
+    private fun setupFiltersUi() {
+        binding.etSearch.addTextChangedListener {
+            searchQuery = it?.toString()?.trim().orEmpty()
+            applyFilters()
+        }
+
+        binding.chipAll.setOnClickListener {
+            typeFilter = null
+            applyFilters()
+        }
+        binding.chipIncome.setOnClickListener {
+            typeFilter = "income"
+            applyFilters()
+        }
+        binding.chipExpense.setOnClickListener {
+            typeFilter = "expense"
+            applyFilters()
+        }
+
+        binding.btnDateFilter.setOnClickListener {
+            showDateRangePicker()
+        }
+        binding.btnClearDateFilter.setOnClickListener {
+            dateFilterStart = null
+            dateFilterEnd = null
+            updateDateFilterLabel()
+            applyFilters()
+        }
+        updateDateFilterLabel()
+    }
+
+    private fun applyFilters() {
+        var list = allTransactions
+
+        typeFilter?.let { type ->
+            list = list.filter { it.type == type }
+        }
+
+        if (searchQuery.isNotEmpty()) {
+            val q = searchQuery.lowercase(Locale.getDefault())
+            list = list.filter { it.description.lowercase(Locale.getDefault()).contains(q) }
+        }
+
+        dateFilterStart?.let { start ->
+            list = list.filter { it.dateMillis >= start }
+        }
+        dateFilterEnd?.let { end ->
+            list = list.filter { it.dateMillis <= end }
+        }
+
+        transactionAdapter.submitList(list)
+        val isEmpty = list.isEmpty()
+        binding.emptyTransactions.visibility = if (isEmpty) android.view.View.VISIBLE else android.view.View.GONE
+        binding.recyclerTransactions.visibility = if (isEmpty) android.view.View.GONE else android.view.View.VISIBLE
+    }
+
+    private fun updateDateFilterLabel() {
+        if (dateFilterStart == null || dateFilterEnd == null) {
+            binding.tvDateFilter.text = getString(R.string.filter_date)
+        } else {
+            val df = SimpleDateFormat("dd.MM.yyyy", Locale("uk"))
+            val text = "${df.format(dateFilterStart)} - ${df.format(dateFilterEnd)}"
+            binding.tvDateFilter.text = text
+        }
     }
 }
