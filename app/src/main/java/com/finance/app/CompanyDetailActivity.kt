@@ -219,12 +219,6 @@ class CompanyDetailActivity : AppCompatActivity() {
                 y += 16f
 
                 for (t in transactions) {
-                    if (y > 800f) {
-                        pdf.finishPage(page)
-                        val newPage = pdf.startPage(pageInfo)
-                        canvas.setBitmap(newPage.canvas.bitmap)
-                        y = 40f
-                    }
                     val dateStr = dfDate.format(t.dateMillis)
                     val typeStr = if (t.type == "income") "Дохід" else "Витрата"
                     val amountStr = dfAmount.format(t.amount)
