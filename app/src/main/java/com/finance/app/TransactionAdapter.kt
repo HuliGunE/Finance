@@ -1,7 +1,7 @@
 package com.finance.app
 
-import android.graphics.Color
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -34,7 +34,9 @@ class TransactionAdapter(
             binding.tvDate.text = dateFormat.format(Date(t.dateMillis))
             val prefix = if (t.type == "income") "+" else "−"
             binding.tvAmount.text = "$prefix ${df.format(t.amount)} грн"
-            binding.tvAmount.setTextColor(if (t.type == "income") Color.parseColor("#4CAF50") else Color.parseColor("#F44336"))
+            binding.tvAmount.setTextColor(
+                ContextCompat.getColor(binding.root.context, if (t.type == "income") R.color.income_green else R.color.expense_red)
+            )
             binding.root.setOnLongClickListener {
                 onDelete(t)
                 true

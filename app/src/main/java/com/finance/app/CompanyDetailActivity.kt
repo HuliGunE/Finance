@@ -96,8 +96,10 @@ class CompanyDetailActivity : AppCompatActivity() {
                 val df = DecimalFormat("0.00", DecimalFormatSymbols(Locale("uk")))
                 binding.tvBalance.text = "${df.format(balance)} грн"
                 binding.tvBalance.setTextColor(
-                    if (balance >= 0) android.graphics.Color.parseColor("#4CAF50")
-                    else android.graphics.Color.parseColor("#F44336")
+                    androidx.core.content.ContextCompat.getColor(
+                        this@CompanyDetailActivity,
+                        if (balance >= 0) R.color.income_green else R.color.expense_red
+                    )
                 )
                 binding.tvTotalIncome.text = "+ ${df.format(income)} грн"
                 binding.tvTotalExpense.text = "− ${df.format(expense)} грн"

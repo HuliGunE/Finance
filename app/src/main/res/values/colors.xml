@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#1976D2</color>
-    <color name="main_background">#F4F7FB</color>
+    <color name="ic_launcher_background">#2563EB</color>
+    <color name="main_background">#F1F5F9</color>
     <color name="card_background">#FFFFFF</color>
-    <color name="card_stroke">#E0E5EF</color>
+    <color name="card_stroke">#E2E8F0</color>
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="income_green">#059669</color>
+    <color name="expense_red">#DC2626</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="surface">#FFFFFF</color>
 </resources>
