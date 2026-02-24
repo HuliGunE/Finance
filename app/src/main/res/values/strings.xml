@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Доходи та витрати</string>
+    <string name="companies">Мої фірми</string>
+    <string name="add_company">Додати фірму</string>
+    <string name="company_name">Назва фірми</string>
+    <string name="company_name_hint">Наприклад: ТОВ «Ромашка»</string>
+    <string name="save">Зберегти</string>
+    <string name="cancel">Скасувати</string>
+    <string name="company_details">Деталі фірми</string>
+    <string name="balance">Залишок</string>
+    <string name="total_income">Всього доходів</string>
+    <string name="total_expense">Всього витрат</string>
+    <string name="add_income">Додати дохід</string>
+    <string name="add_expense">Додати витрату</string>
+    <string name="add_transaction">Додати запис</string>
+    <string name="amount">Сума (грн)</string>
+    <string name="amount_hint">0.00</string>
+    <string name="description">Опис</string>
+    <string name="description_hint">На що/звідки гроші</string>
+    <string name="income">Дохід</string>
+    <string name="expense">Витрата</string>
+    <string name="transactions">Операції</string>
+    <string name="empty_companies">Поки немає жодної фірми.\n\nНатисніть кнопку «Додати фірму» внизу екрана.</string>
+    <string name="empty_transactions">Немає операцій.\n\nДодайте дохід або витрату кнопками внизу.</string>
+    <string name="delete">Видалити</string>
+    <string name="fill_name">Введіть назву фірми</string>
+    <string name="fill_amount">Введіть суму</string>
+</resources>

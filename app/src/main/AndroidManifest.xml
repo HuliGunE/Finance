@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Finance">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Finance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CompanyDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/company_details" />
+        <activity
+            android:name=".AddCompanyActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/add_company" />
+        <activity
+            android:name=".AddTransactionActivity"
+            android:exported="false"
+            android:parentActivityName=".CompanyDetailActivity"
+            android:label="@string/add_transaction" />
+    </application>
+</manifest>
