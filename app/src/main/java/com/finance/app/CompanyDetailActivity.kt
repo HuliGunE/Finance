@@ -311,8 +311,8 @@ class CompanyDetailActivity : AppCompatActivity() {
     }
 
     private fun setupFiltersUi() {
-        binding.etSearch.addTextChangedListener { text, _, _, _ ->
-            searchQuery = text?.toString()?.trim().orEmpty()
+        binding.etSearch.addTextChangedListener { editable ->
+            searchQuery = editable?.toString()?.trim().orEmpty()
             applyFilters()
         }
 
